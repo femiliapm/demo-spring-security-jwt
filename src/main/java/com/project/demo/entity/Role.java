@@ -20,6 +20,15 @@ public class Role {
 	@Column(name = "name", length = 20)
 	private ERole name;
 
+	public Role() {
+		super();
+	}
+
+	public Role(ERole name) {
+		super();
+		this.name = name;
+	}
+
 	public Integer getId() {
 		return id;
 	}

@@ -31,18 +31,17 @@ public class User {
 
 	@ManyToMany
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles;
+	private Set<Role> roles = new HashSet<>();
 
 	public User() {
 		super();
 	}
 
-	public User(String username, String email, String password, Set<Role> roles) {
+	public User(String username, String email, String password) {
 		super();
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.roles = roles;
 	}
 
 	public Set<Role> getRoles() {

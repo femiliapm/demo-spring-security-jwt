@@ -1,5 +1,6 @@
 package com.project.demo.controller;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.demo.dto.JWTResponse;
+import com.project.demo.dto.RegisterForm;
 import com.project.demo.dto.StatusMessageDto;
+import com.project.demo.entity.ERole;
+import com.project.demo.entity.Role;
 import com.project.demo.entity.User;
 import com.project.demo.repository.RoleRepository;
 import com.project.demo.repository.UserRepository;
@@ -57,21 +61,60 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> register(@RequestBody User dto) {
+	public ResponseEntity<?> register(@RequestBody RegisterForm dto) {
 		User user = userRepository.findByUsername(dto.getUsername());
 		StatusMessageDto response = new StatusMessageDto();
 		if (user != null) {
 			response.setMessage("Username telah dipakai");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(response);
 		}
-		
+
 //		register account
-		User userCreated = new User(dto.getUsername(), dto.getEmail(), passwordEncoder.encode(dto.getPassword()), dto.getRoles());
-		userRepository.save(userCreated);
+		User userCreated = new User(dto.getUsername(), dto.getEmail(), passwordEncoder.encode(dto.getPassword()));
+
+		Set<String> roleString = dto.getRole();
+		Set<Role> roles = new HashSet<>();
+
+		if (roleString == null) {
+			try {
+				Role userRole = roleRepository.findByName(ERole.USER);
+				roles.add(userRole);
+			} catch (RuntimeException e) {
+				// TODO: handle exception
+				throw new RuntimeException("Role not found.");
+			}
+		} else {
+			roleString.forEach(role -> {
+				switch (role) {
+				case "admin":
+					try {
+						Role adminRole = roleRepository.findByName(ERole.ADMIN);
+						roles.add(adminRole);
+					} catch (RuntimeException e) {
+						// TODO: handle exception
+						throw new RuntimeException("Role not found.");
+					}
+					break;
+
+				default:
+					try {
+						Role userRole = roleRepository.findByName(ERole.USER);
+						roles.add(userRole);
+					} catch (RuntimeException e) {
+						// TODO: handle exception
+						throw new RuntimeException("Role not found.");
+					}
+					break;
+				}
+			});
+		}
 		
+		userCreated.setRoles(roles);
+		userRepository.save(userCreated);
+
 		response.setMessage("User created!");
 		response.setData(userCreated);
-		
+
 		return ResponseEntity.ok(response);
 	}
 }
