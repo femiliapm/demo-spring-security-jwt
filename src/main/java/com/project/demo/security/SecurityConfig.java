@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.project.demo.security.jwt.AuthEntyPoint;
+import com.project.demo.security.jwt.AuthEntryPoint;
 import com.project.demo.security.jwt.AuthTokenFilter;
 import com.project.demo.security.service.UserDetailsServiceImpl;
 
@@ -24,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private UserDetailsServiceImpl userDetailsService;
 
 	@Autowired
-	private AuthEntyPoint authEntyPoint;
+	private AuthEntryPoint authEntyPoint;
 
 	@Bean
 	public AuthTokenFilter authTokenFilter() {
